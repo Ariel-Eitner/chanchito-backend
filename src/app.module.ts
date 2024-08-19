@@ -10,12 +10,15 @@ import {
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { TransactionsModule } from './transactions/module/transactions.module';
+import { UsersModule } from './users/module/users.module';
+import { AuthService } from './auth/service/auth.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.DATABASE_URI),
     TransactionsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
