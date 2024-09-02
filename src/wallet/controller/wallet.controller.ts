@@ -18,30 +18,34 @@ export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
   @Post()
-  async create(@Body() createWalletDto: CreateWalletDto): Promise<Wallet> {
-    return this.walletService.create(createWalletDto);
+  async createWalletController(
+    @Body() createWalletDto: CreateWalletDto,
+  ): Promise<Wallet> {
+    return this.walletService.createWalletService(createWalletDto);
   }
 
   @Get()
-  async findAllByUser(@Query('userId') userId: string): Promise<Wallet[]> {
-    return this.walletService.findAllByUser(userId);
+  async findAllWalletsByUserController(
+    @Query('userId') userId: string,
+  ): Promise<Wallet[]> {
+    return this.walletService.findAllWalletsByUserService(userId);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Wallet> {
-    return this.walletService.findOne(id);
+  async findOneWalletController(@Param('id') id: string): Promise<Wallet> {
+    return this.walletService.findOneWalletService(id);
   }
 
   @Patch(':id')
-  async update(
+  async updateWalletController(
     @Param('id') id: string,
     @Body() updateWalletDto: UpdateWalletDto,
   ): Promise<Wallet> {
-    return this.walletService.update(id, updateWalletDto);
+    return this.walletService.updateWalletService(id, updateWalletDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    return this.walletService.remove(id);
+  async deleteWalletController(@Param('id') id: string): Promise<void> {
+    return this.walletService.deleteWalletService(id);
   }
 }

@@ -11,7 +11,7 @@ export class WalletService {
     @InjectModel(Wallet.name) private walletModel: Model<WalletDocument>,
   ) {}
 
-  async create(createWalletDto: CreateWalletDto): Promise<Wallet> {
+  async createWalletService(createWalletDto: CreateWalletDto): Promise<Wallet> {
     const { userId, ...rest } = createWalletDto;
 
     const newWallet = new this.walletModel({
@@ -22,11 +22,11 @@ export class WalletService {
     return newWallet.save();
   }
 
-  async findAllByUser(userId: string): Promise<Wallet[]> {
+  async findAllWalletsByUserService(userId: string): Promise<Wallet[]> {
     return this.walletModel.find({ userId: new Types.ObjectId(userId) }).exec();
   }
 
-  async findOne(id: string): Promise<Wallet> {
+  async findOneWalletService(id: string): Promise<Wallet> {
     const wallet = await this.walletModel.findById(id).exec();
     if (!wallet) {
       throw new NotFoundException(`Wallet with ID "${id}" not found`);
@@ -34,7 +34,10 @@ export class WalletService {
     return wallet;
   }
 
-  async update(id: string, updateWalletDto: UpdateWalletDto): Promise<Wallet> {
+  async updateWalletService(
+    id: string,
+    updateWalletDto: UpdateWalletDto,
+  ): Promise<Wallet> {
     const updatedWallet = await this.walletModel
       .findByIdAndUpdate(id, updateWalletDto, {
         new: true,
@@ -48,7 +51,7 @@ export class WalletService {
     return updatedWallet;
   }
 
-  async remove(id: string): Promise<void> {
+  async deleteWalletService(id: string): Promise<void> {
     const result = await this.walletModel.findByIdAndDelete(id).exec();
     if (!result) {
       throw new NotFoundException(`Wallet with ID "${id}" not found`);

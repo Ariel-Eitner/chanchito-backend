@@ -25,17 +25,20 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
-  generateJwt(userId: string): string {
+  generateJwtService(userId: string): string {
     const payload = { userId };
     return this.jwtService.sign(payload);
   }
 
-  async login(loginDto: LoginDto): Promise<{ accessToken: string }> {
-    const user = await this.usersService.findByEmail(loginDto.email);
+  async loginService(loginDto: LoginDto): Promise<{ accessToken: string }> {
+    const user = await this.usersService.findUserByEmailService(loginDto.email);
 
     if (
       !user ||
-      !(await this.usersService.validatePassword(user, loginDto.password))
+      !(await this.usersService.validateUserPasswordService(
+        user,
+        loginDto.password,
+      ))
     ) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -46,7 +49,7 @@ export class AuthService {
     return { accessToken };
   }
 
-  async changePassword(
+  async changePasswordService(
     userId: string,
     changePasswordDto: ChangePasswordDto,
   ): Promise<void> {

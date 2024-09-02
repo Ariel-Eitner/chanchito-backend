@@ -14,7 +14,6 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { AuthService } from 'src/auth/service/auth.service';
 import * as bcrypt from 'bcrypt';
 import { Transaction } from 'src/transactions/schemas/transaction.schema';
-import { Subscription } from 'rxjs';
 
 interface UserWithToken {
   user: User;
@@ -30,7 +29,9 @@ export class UsersService {
     private readonly authService: AuthService,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserWithToken> {
+  async createUserService(
+    createUserDto: CreateUserDto,
+  ): Promise<UserWithToken> {
     const existingUser = await this.userModel
       .findOne({ email: createUserDto.email })
       .exec();
@@ -47,15 +48,15 @@ export class UsersService {
     const user = await createdUser.save();
 
     const userId = String(user._id);
-    const token = this.authService.generateJwt(userId);
+    const token = this.authService.generateJwtService(userId);
     return { user, token };
   }
 
-  async fetchAll(): Promise<User[]> {
+  async fetchAllUsersService(): Promise<User[]> {
     return this.userModel.find().exec();
   }
 
-  async fetchById(id: string): Promise<User> {
+  async fetchUserByIdService(id: string): Promise<User> {
     const user = await this.userModel.findById(id).exec();
     if (!user) {
       throw new NotFoundException(`User with ID "${id}" not found`);
@@ -63,7 +64,10 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async updateUserService(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User> {
     const updatedUser = await this.userModel
       .findByIdAndUpdate(id, updateUserDto, { new: true })
       .exec();
@@ -74,7 +78,7 @@ export class UsersService {
     return updatedUser;
   }
 
-  async delete(id: string, password: string): Promise<void> {
+  async deleteUserService(id: string, password: string): Promise<void> {
     // Encuentra al usuario por ID
     const user = await this.userModel.findById(id).exec();
     if (!user) {
@@ -96,21 +100,14 @@ export class UsersService {
     }
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findUserByEmailService(email: string): Promise<User | null> {
     return this.userModel.findOne({ email }).exec();
   }
 
-  async findById(id: string): Promise<User> {
-    const user = await this.userModel.findById(id).exec();
-
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
-    return user;
-  }
-
-  async validatePassword(user: User, password: string): Promise<boolean> {
+  async validateUserPasswordService(
+    user: User,
+    password: string,
+  ): Promise<boolean> {
     return bcrypt.compare(password, user.password);
   }
 }

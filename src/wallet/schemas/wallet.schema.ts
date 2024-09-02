@@ -13,6 +13,7 @@ export class Wallet extends Document {
   @Prop({ required: true })
   @IsString()
   name: string;
+
   @Prop({ required: true, enum: ['cash', 'bank', 'virtual', 'credit'] })
   @IsEnum(['cash', 'bank', 'virtual', 'credit'])
   type: string;

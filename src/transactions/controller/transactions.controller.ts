@@ -29,7 +29,7 @@ export class TransactionsController {
 
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  async create(
+  async createTransactionController(
     @Body() createTransactionDto: CreateTransactionDto,
     @Req() req: AuthenticatedRequest,
   ): Promise<{ message: string; transaction: Transaction }> {
@@ -41,7 +41,9 @@ export class TransactionsController {
       };
 
       const transaction =
-        await this.transactionsService.create(transactionData);
+        await this.transactionsService.createTransactionService(
+          transactionData,
+        );
       return { message: 'Transaction created successfully', transaction };
     } catch (error) {
       console.error(error);
@@ -53,12 +55,13 @@ export class TransactionsController {
   }
 
   @Get()
-  async findAll(
+  async findAllTransactionsController(
     @Req() req: AuthenticatedRequest,
   ): Promise<{ message: string; transactions: Transaction[] }> {
     try {
       const userId = req.user.sub;
-      const transactions = await this.transactionsService.findAll(userId);
+      const transactions =
+        await this.transactionsService.findAllTransactionsService(userId);
       return { message: 'Transactions retrieved successfully', transactions };
     } catch (error) {
       console.error(error);
@@ -70,13 +73,14 @@ export class TransactionsController {
   }
 
   @Get(':id')
-  async findOne(
+  async findOneTransactionController(
     @Param('id') id: string,
     @Req() req: any,
   ): Promise<{ message: string; transaction: Transaction }> {
     try {
       const userId = req.user.sub;
-      const transaction = await this.transactionsService.findOne(id, userId);
+      const transaction =
+        await this.transactionsService.findOneTransactionService(id, userId);
       return { message: 'Transaction retrieved successfully', transaction };
     } catch (error) {
       console.error(error);
@@ -88,18 +92,19 @@ export class TransactionsController {
   }
 
   @Put(':id')
-  async update(
+  async updateTransactionController(
     @Param('id') id: string,
     @Body() updateTransactionDto: UpdateTransactionDto,
     @Req() req: any,
   ): Promise<{ message: string; transaction: Transaction }> {
     try {
       const userId = req.user.sub;
-      const transaction = await this.transactionsService.update(
-        id,
-        updateTransactionDto,
-        userId,
-      );
+      const transaction =
+        await this.transactionsService.updateTransactionService(
+          id,
+          updateTransactionDto,
+          userId,
+        );
       return { message: 'Transaction updated successfully', transaction };
     } catch (error) {
       console.error(error);
@@ -111,13 +116,14 @@ export class TransactionsController {
   }
 
   @Delete(':id')
-  async remove(
+  async deleteTransactionController(
     @Param('id') id: string,
     @Req() req: any,
   ): Promise<{ message: string; transaction: Transaction }> {
     try {
       const userId = req.user.sub;
-      const transaction = await this.transactionsService.remove(id, userId);
+      const transaction =
+        await this.transactionsService.deleteTransactionService(id, userId);
       return { message: 'Transaction deleted successfully', transaction };
     } catch (error) {
       console.error(error);

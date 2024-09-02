@@ -21,9 +21,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() loginDto: LoginDto, @Res() res: Response) {
+  async loginController(@Body() loginDto: LoginDto, @Res() res: Response) {
     try {
-      const { accessToken } = await this.authService.login(loginDto);
+      const { accessToken } = await this.authService.loginService(loginDto);
 
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -49,7 +49,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout(@Req() req: Request, @Res() res: Response) {
+  logoutController(@Req() req: Request, @Res() res: Response) {
     // Aquí puedes manejar la invalidación de tokens en el backend si es necesario
 
     // Limpia la cookie si estás usando una
@@ -66,7 +66,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Put('change-password')
-  async changePassword(
+  async changePasswordController(
     @Req() req: AuthenticatedRequest,
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
@@ -76,7 +76,7 @@ export class AuthController {
         throw new UnauthorizedException('Token missing');
       }
       const userId = req.user.sub;
-      await this.authService.changePassword(userId, changePasswordDto);
+      await this.authService.changePasswordService(userId, changePasswordDto);
 
       return {
         statusCode: HttpStatus.OK,

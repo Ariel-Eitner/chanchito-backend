@@ -24,9 +24,12 @@ export class UserController {
   constructor(private readonly userService: UsersService) {}
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+  async createUserController(
+    @Body() createUserDto: CreateUserDto,
+    @Res() res: Response,
+  ) {
     try {
-      const user = await this.userService.create(createUserDto);
+      const user = await this.userService.createUserService(createUserDto);
       return res.status(HttpStatus.CREATED).json({
         message: 'User created successfully',
         data: user,
@@ -42,9 +45,9 @@ export class UserController {
   }
 
   @Get()
-  async fetchAll(@Res() res: Response) {
+  async fetchAllUsersController(@Res() res: Response) {
     try {
-      const users = await this.userService.fetchAll();
+      const users = await this.userService.fetchAllUsersService();
       return res.status(HttpStatus.OK).json({
         message: 'Users retrieved successfully',
         data: users,
@@ -57,9 +60,9 @@ export class UserController {
   }
 
   @Get(':id')
-  async fetchById(@Param('id') id: string, @Res() res: Response) {
+  async fetchUserByIdController(@Param('id') id: string, @Res() res: Response) {
     try {
-      const user = await this.userService.fetchById(id);
+      const user = await this.userService.fetchUserByIdService(id);
       return res.status(HttpStatus.OK).json({
         message: 'User retrieved successfully',
         data: user,
@@ -77,13 +80,13 @@ export class UserController {
   }
 
   @Put(':id')
-  async update(
+  async updateUserController(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @Res() res: Response,
   ) {
     try {
-      const user = await this.userService.update(id, updateUserDto);
+      const user = await this.userService.updateUserService(id, updateUserDto);
       return res.status(HttpStatus.OK).json({
         message: 'User updated successfully',
         data: user,
@@ -101,13 +104,13 @@ export class UserController {
   }
 
   @Delete(':id')
-  async delete(
+  async deleteUserController(
     @Param('id') id: string,
     @Body('password') password: string,
     @Res() res: Response,
   ) {
     try {
-      await this.userService.delete(id, password);
+      await this.userService.deleteUserService(id, password);
       return res
         .status(HttpStatus.OK)
         .json({ message: 'User deleted successfully' });
