@@ -7,6 +7,11 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from '../dto/login.dto';
 import { UsersService } from 'src/users/service/users.service';
+import { ChangePasswordDto } from '../dto/ChangePasswordDto';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from 'src/users/schemas/user.schema';
+import { Model } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 export interface JwtPayload {
   sub: string;
 }
@@ -17,6 +22,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   generateJwt(userId: string): string {
@@ -28,8 +34,8 @@ export class AuthService {
     const user = await this.usersService.findByEmail(loginDto.email);
 
     if (
-      !user
-      // !(await this.usersService.validatePassword(user, loginDto.password))
+      !user ||
+      !(await this.usersService.validatePassword(user, loginDto.password))
     ) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -40,19 +46,23 @@ export class AuthService {
     return { accessToken };
   }
 
-  // async validateToken(token: string): Promise<any> {
-  //   try {
-  //     const decodedToken = this.jwtService.verify<JwtPayload>(token);
-  //     console.log(decodedToken, 'decoded token');
-  //     const user = await this.usersService.findById(decodedToken.sub);
+  async changePassword(
+    userId: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<void> {
+    const { currentPassword, newPassword } = changePasswordDto;
 
-  //     if (!user) {
-  //       throw new UnauthorizedException('User not found');
-  //     }
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new UnauthorizedException('Usuario no encontrado');
+    }
 
-  //     return user; // Devuelve al usuario autenticado
-  //   } catch (error) {
-  //     throw new UnauthorizedException('Invalid token');
-  //   }
-  // }
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('Contraseña actual incorrecta');
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+  }
 }

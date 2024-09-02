@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
@@ -14,31 +14,38 @@ export interface AuthenticatedRequest extends Request {
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(
-    private readonly jwtService: JwtService,
-    private reflector: Reflector,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const authHeader = request.headers.authorization;
-
-    if (!authHeader) {
-      throw new UnauthorizedException('Authorization header missing');
-    }
-    const token = authHeader.split(' ')[1];
+    const token = request.cookies['accessToken'];
     if (!token) {
       throw new UnauthorizedException('Token missing');
     }
 
     try {
-      const payload = this.jwtService.verify(token);
-      console.log(payload, 'payload');
-      request.user = payload; // Adjunta el payload (datos del usuario) a la request
+      const payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      request.user = payload;
     } catch (err) {
-      throw new UnauthorizedException('Invalid token');
+      if (err.name === 'TokenExpiredError') {
+        // Token expirado
+        throw new UnauthorizedException(
+          'Token has expired. Please log in again.',
+        );
+      } else if (err.name === 'JsonWebTokenError') {
+        // Token inválido
+        throw new UnauthorizedException(
+          'Invalid token. Please provide a valid token.',
+        );
+      } else {
+        // Otro tipo de error
+        throw new UnauthorizedException(
+          'Could not authenticate. Please try again.',
+        );
+      }
     }
-
     return true;
   }
 }

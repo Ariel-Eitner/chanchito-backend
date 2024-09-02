@@ -20,28 +20,18 @@ export class TransactionsService {
   async create(
     createTransactionDto: CreateTransactionDto,
   ): Promise<Transaction> {
-    console.log(createTransactionDto);
     const createdTransaction = new this.transactionModel(createTransactionDto);
     return createdTransaction.save();
   }
 
   async findAll(userId: string): Promise<Transaction[]> {
-    Logger.log(`User ID: ${userId}`, 'TransactionService');
-    return this.transactionModel.find({ userId }).exec(); // Filtra por userId
+    return this.transactionModel.find({ userId }).exec();
   }
 
   async findOne(id: string, userId: string): Promise<Transaction> {
     Logger.log(`User ID: ${userId}`, 'TransactionService');
-    return this.transactionModel.findOne({ _id: id, userId }).exec(); // Filtra por userId
+    return this.transactionModel.findOne({ _id: id, userId }).exec();
   }
-
-  // async findOne(id: string): Promise<Transaction> {
-  //   const transaction = await this.transactionModel.findById(id).exec();
-  //   if (!transaction) {
-  //     throw new NotFoundException(`Transaction #${id} not found`);
-  //   }
-  //   return transaction;
-  // }
 
   async update(
     id: string,

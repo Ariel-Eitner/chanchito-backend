@@ -22,8 +22,8 @@ import {
   JwtAuthGuard,
 } from 'src/auth/guards/jwt-auth.guard';
 
-@Controller('transactions')
 @UseGuards(JwtAuthGuard)
+@Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
@@ -34,10 +34,10 @@ export class TransactionsController {
     @Req() req: AuthenticatedRequest,
   ): Promise<{ message: string; transaction: Transaction }> {
     try {
-      const userId = req.user.userId; // Obtener el ID del usuario desde la solicitud
+      const userId = req.user.sub;
       const transactionData = {
         ...createTransactionDto,
-        userId, // Incluir el ID del usuario en los datos de la transacción
+        userId,
       };
 
       const transaction =
@@ -54,12 +54,11 @@ export class TransactionsController {
 
   @Get()
   async findAll(
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ): Promise<{ message: string; transactions: Transaction[] }> {
     try {
-      console.log(req.user);
-      const userId = req.user.userId; // Obtener el ID del usuario desde la solicitud
-      const transactions = await this.transactionsService.findAll(userId); // Pasar el userId al servicio
+      const userId = req.user.sub;
+      const transactions = await this.transactionsService.findAll(userId);
       return { message: 'Transactions retrieved successfully', transactions };
     } catch (error) {
       console.error(error);
@@ -76,8 +75,8 @@ export class TransactionsController {
     @Req() req: any,
   ): Promise<{ message: string; transaction: Transaction }> {
     try {
-      const userId = req.user.userId; // Obtener el ID del usuario desde la solicitud
-      const transaction = await this.transactionsService.findOne(id, userId); // Pasar el userId al servicio
+      const userId = req.user.sub;
+      const transaction = await this.transactionsService.findOne(id, userId);
       return { message: 'Transaction retrieved successfully', transaction };
     } catch (error) {
       console.error(error);
@@ -95,11 +94,11 @@ export class TransactionsController {
     @Req() req: any,
   ): Promise<{ message: string; transaction: Transaction }> {
     try {
-      const userId = req.user.userId; // Obtener el ID del usuario desde la solicitud
+      const userId = req.user.sub;
       const transaction = await this.transactionsService.update(
         id,
         updateTransactionDto,
-        userId, // Pasar el userId al servicio
+        userId,
       );
       return { message: 'Transaction updated successfully', transaction };
     } catch (error) {
@@ -117,8 +116,8 @@ export class TransactionsController {
     @Req() req: any,
   ): Promise<{ message: string; transaction: Transaction }> {
     try {
-      const userId = req.user.userId; // Obtener el ID del usuario desde la solicitud
-      const transaction = await this.transactionsService.remove(id, userId); // Pasar el userId al servicio
+      const userId = req.user.sub;
+      const transaction = await this.transactionsService.remove(id, userId);
       return { message: 'Transaction deleted successfully', transaction };
     } catch (error) {
       console.error(error);

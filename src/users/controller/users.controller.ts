@@ -11,6 +11,7 @@ import {
   NotFoundException,
   ConflictException,
   UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from '../service/users.service';
@@ -100,9 +101,13 @@ export class UserController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string, @Res() res: Response) {
+  async delete(
+    @Param('id') id: string,
+    @Body('password') password: string,
+    @Res() res: Response,
+  ) {
     try {
-      await this.userService.delete(id);
+      await this.userService.delete(id, password);
       return res
         .status(HttpStatus.OK)
         .json({ message: 'User deleted successfully' });
@@ -111,6 +116,11 @@ export class UserController {
         return res
           .status(HttpStatus.NOT_FOUND)
           .json({ message: error.message });
+      }
+      if (error instanceof UnauthorizedException) {
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: 'Incorrect password' });
       }
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)

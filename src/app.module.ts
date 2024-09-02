@@ -12,6 +12,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TransactionsModule } from './transactions/module/transactions.module';
 import { UsersModule } from './users/module/users.module';
 import { AuthService } from './auth/service/auth.service';
+import { WalletModule } from './wallet/module/wallet.module';
+import { WalletService } from './wallet/service/wallet.service';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { AuthService } from './auth/service/auth.service';
     MongooseModule.forRoot(process.env.DATABASE_URI),
     TransactionsModule,
     UsersModule,
+    WalletModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -13,6 +13,8 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { AuthService } from 'src/auth/service/auth.service';
 import * as bcrypt from 'bcrypt';
+import { Transaction } from 'src/transactions/schemas/transaction.schema';
+import { Subscription } from 'rxjs';
 
 interface UserWithToken {
   user: User;
@@ -23,6 +25,8 @@ interface UserWithToken {
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel('Transaction')
+    private readonly transactionModel: Model<Transaction>,
     private readonly authService: AuthService,
   ) {}
 
@@ -33,8 +37,13 @@ export class UsersService {
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
-    const createdUser = new this.userModel(createUserDto);
+    const createdUser = new this.userModel({
+      ...createUserDto,
+      password: hashedPassword,
+    });
     const user = await createdUser.save();
 
     const userId = String(user._id);
@@ -65,7 +74,22 @@ export class UsersService {
     return updatedUser;
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string, password: string): Promise<void> {
+    // Encuentra al usuario por ID
+    const user = await this.userModel.findById(id).exec();
+    if (!user) {
+      throw new NotFoundException(`User with ID "${id}" not found`);
+    }
+
+    await this.transactionModel.deleteMany({ userId: id }).exec();
+
+    // Verifica la contraseña
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('Incorrect password');
+    }
+
+    // Si la contraseña es correcta, elimina al usuario
     const result = await this.userModel.findByIdAndDelete(id).exec();
     if (!result) {
       throw new NotFoundException(`User with ID "${id}" not found`);
