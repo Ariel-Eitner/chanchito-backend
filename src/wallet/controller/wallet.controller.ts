@@ -7,12 +7,18 @@ import {
   Param,
   Delete,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { WalletService } from '../service/wallet.service';
 import { CreateWalletDto } from '../dto/create-wallet.dto';
 import { Wallet } from '../schemas/wallet.schema';
 import { UpdateWalletDto } from '../dto/update-wallet.dto';
-
+import {
+  AuthenticatedRequest,
+  JwtAuthGuard,
+} from 'src/auth/guards/jwt-auth.guard';
+@UseGuards(JwtAuthGuard)
 @Controller('wallets')
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
@@ -26,9 +32,19 @@ export class WalletController {
 
   @Get()
   async findAllWalletsByUserController(
-    @Query('userId') userId: string,
-  ): Promise<Wallet[]> {
-    return this.walletService.findAllWalletsByUserService(userId);
+    @Req() req: AuthenticatedRequest,
+  ): Promise<{ message: string; wallets: Wallet[] }> {
+    const userId = req.user.sub;
+    try {
+      // Espera a que la promesa se resuelva y obtén las wallets
+      const wallets =
+        await this.walletService.findAllWalletsByUserService(userId);
+      return { message: 'Wallets retrieved successfully', wallets };
+    } catch (error) {
+      // Maneja el error de manera adecuada
+      console.error('Error retrieving wallets:', error);
+      throw new Error('Error retrieving wallets');
+    }
   }
 
   @Get(':id')

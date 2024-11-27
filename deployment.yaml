@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chanchito-backend
+spec:
+  replicas: 2 # Número de réplicas que se desean (ajusta según tus pruebas de escalabilidad)
+  selector:
+    matchLabels:
+      app: chanchito-backend
+  template:
+    metadata:
+      labels:
+        app: chanchito-backend
+    spec:
+      containers:
+        - name: chanchito-backend-container
+          image: chanchito-backend-nestjs # Usa el nombre de tu imagen Docker o del contenedor si lo tienes en un registry
+          ports:
+            - containerPort: 3600 # Mismo puerto que en docker-compose
+          env:
+            - name: NODE_ENV
+              value: 'production'
+            - name: PORT
+              value: '3600'
+          volumeMounts:
+            - name: src-volume
+              mountPath: /app/src # Mapeo del volumen para tu código fuente
+            - name: node-modules-volume
+              mountPath: /app/node_modules
+      volumes:
+        - name: src-volume
+          hostPath:
+            path: ./src
+        - name: node-modules-volume
+          emptyDir: {} # Utilizamos un volumen temporal para node_modules

@@ -24,7 +24,7 @@ export class TransactionsService {
     return createdTransaction.save();
   }
 
-  async findAllTransactionsService(userId: string): Promise<Transaction[]> {
+  async findAllUserTransactionsService(userId: string): Promise<Transaction[]> {
     return this.transactionModel.find({ userId }).exec();
   }
 

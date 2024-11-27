@@ -11,8 +11,9 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Transaction } from 'src/transactions/schemas/transaction.schema';
+
 import { Subscription } from 'src/suscriptions/schemas/subscription.schema';
+import { Transaction } from 'src/transactions/schemas/transaction.schema';
 
 export type UserDocument = User & Document;
 

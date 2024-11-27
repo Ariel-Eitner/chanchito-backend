@@ -1,0 +1,17 @@
+version: '3'
+services:
+  app:
+    build:
+      context: . # Usa el Dockerfile en el directorio actual
+    container_name: chanchito-backend-nestjs # Nombre del contenedor
+    ports:
+      - '3600:3600' # Mapea el puerto 3600 del contenedor al puerto 3600 de la máquina
+    environment:
+      - NODE_ENV=production
+      - PORT=3600
+      # Incluye otras variables de entorno aquí o en tu .env
+    volumes:
+      - ./src:/app/src # Mapea el directorio 'src' local al contenedor para el desarrollo
+      - /app/node_modules # Para evitar conflictos con node_modules locales
+    command: npm run start:prod # Cambia a start:prod si no estás en desarrollo
+    restart: always # Reinicia el contenedor si se detiene por algún motivo

@@ -12,6 +12,7 @@ import {
   ConflictException,
   UseGuards,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UsersService } from '../service/users.service';
@@ -38,26 +39,31 @@ export class UserController {
       if (error instanceof ConflictException) {
         return res.status(HttpStatus.CONFLICT).json({ message: error.message });
       }
+      if (error instanceof BadRequestException) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: error.message });
+      }
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ message: 'An error occurred' });
     }
   }
 
-  @Get()
-  async fetchAllUsersController(@Res() res: Response) {
-    try {
-      const users = await this.userService.fetchAllUsersService();
-      return res.status(HttpStatus.OK).json({
-        message: 'Users retrieved successfully',
-        data: users,
-      });
-    } catch (error) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: 'An error occurred' });
-    }
-  }
+  // @Get()
+  // async fetchAllUsersController(@Res() res: Response) {
+  //   try {
+  //     const users = await this.userService.fetchAllUsersService();
+  //     return res.status(HttpStatus.OK).json({
+  //       message: 'Users retrieved successfully',
+  //       data: users,
+  //     });
+  //   } catch (error) {
+  //     return res
+  //       .status(HttpStatus.INTERNAL_SERVER_ERROR)
+  //       .json({ message: 'An error occurred' });
+  //   }
+  // }
 
   @Get(':id')
   async fetchUserByIdController(@Param('id') id: string, @Res() res: Response) {
@@ -95,6 +101,10 @@ export class UserController {
       if (error instanceof NotFoundException) {
         return res
           .status(HttpStatus.NOT_FOUND)
+          .json({ message: error.message });
+      } else if (error instanceof BadRequestException) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
           .json({ message: error.message });
       }
       return res

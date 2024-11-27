@@ -55,13 +55,13 @@ export class TransactionsController {
   }
 
   @Get()
-  async findAllTransactionsController(
+  async findAllUserTransactionsController(
     @Req() req: AuthenticatedRequest,
   ): Promise<{ message: string; transactions: Transaction[] }> {
     try {
       const userId = req.user.sub;
       const transactions =
-        await this.transactionsService.findAllTransactionsService(userId);
+        await this.transactionsService.findAllUserTransactionsService(userId);
       return { message: 'Transactions retrieved successfully', transactions };
     } catch (error) {
       console.error(error);

@@ -15,7 +15,7 @@ import { AuthService } from 'src/auth/service/auth.service';
 import * as bcrypt from 'bcrypt';
 import { Transaction } from 'src/transactions/schemas/transaction.schema';
 
-interface UserWithToken {
+export interface UserWithToken {
   user: User;
   token: string;
 }
@@ -50,10 +50,6 @@ export class UsersService {
     const userId = String(user._id);
     const token = this.authService.generateJwtService(userId);
     return { user, token };
-  }
-
-  async fetchAllUsersService(): Promise<User[]> {
-    return this.userModel.find().exec();
   }
 
   async fetchUserByIdService(id: string): Promise<User> {

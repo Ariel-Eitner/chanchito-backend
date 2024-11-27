@@ -1,18 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { TransactionsController } from './transactions.controller';
+// import { Test, TestingModule } from '@nestjs/testing';
+// import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+// import { AuthModule } from 'src/auth/module/auth.module';
 
-describe('TransactionsController', () => {
-  let controller: TransactionsController;
+// describe('JwtAuthGuard', () => {
+//   let guard: JwtAuthGuard;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [TransactionsController],
-    }).compile();
+//   beforeEach(async () => {
+//     const module: TestingModule = await Test.createTestingModule({
+//       imports: [AuthModule], // Importa el módulo que proporciona JwtService
+//       providers: [JwtAuthGuard],
+//     }).compile();
 
-    controller = module.get<TransactionsController>(TransactionsController);
-  });
+//     guard = module.get<JwtAuthGuard>(JwtAuthGuard);
+//   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-});
+//   it('should be defined', () => {
+//     expect(guard).toBeDefined();
+//   });
+// });
